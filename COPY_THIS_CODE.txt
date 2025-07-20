@@ -1,0 +1,348 @@
+COPY THIS ENTIRE TEXT AND SAVE AS "ColorPaletteStudio.html"
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Studio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
+        .hero-section { 
+            background: linear-gradient(135deg, #6f42c1, #9c27b0); 
+            color: white; 
+            padding: 100px 0; 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+        }
+        .palette-card { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 20px; 
+            margin: 10px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+        }
+        .color-swatch { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 10px; 
+            margin: 5px; 
+            display: inline-block; 
+            border: 2px solid white; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+        }
+        .client-color-circle { 
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; 
+            margin: 10px auto; 
+            border: 3px solid white; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2); 
+        }
+        .shopping-card { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 20px; 
+            text-align: center; 
+            margin: 10px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+        }
+        .section { display: none; }
+        .section.active { display: block; }
+        .btn { border-radius: 10px; font-weight: 600; }
+        .btn-primary { background: linear-gradient(135deg, #6f42c1, #9c27b0); border: none; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand"><i class="fas fa-palette"></i> Color Palette Studio</span>
+            <div>
+                <button class="btn btn-outline-light btn-sm" onclick="showHome()">Home</button>
+                <button class="btn btn-outline-light btn-sm" onclick="showAdmin()">Admin</button>
+                <button class="btn btn-outline-light btn-sm" onclick="showLogin()">Client Access</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HOME SECTION -->
+    <div id="home" class="section active">
+        <div class="hero-section">
+            <div class="container text-center">
+                <h1 class="display-4 mb-4">Color Palette Studio</h1>
+                <p class="lead mb-4">Personalized Color Consulting for Your Clients</p>
+                <button class="btn btn-primary btn-lg me-3" onclick="showAdmin()">
+                    <i class="fas fa-user-tie"></i> Stylist Dashboard
+                </button>
+                <button class="btn btn-outline-light btn-lg" onclick="showLogin()">
+                    <i class="fas fa-user"></i> Client Access
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN SECTION -->
+    <div id="admin" class="section">
+        <div class="container mt-4">
+            <h2><i class="fas fa-user-tie"></i> Stylist Dashboard</h2>
+            
+            <div class="row mb-4">
+                <div class="col-12">
+                    <button class="btn btn-info me-2" onclick="addDemoData()">Add Demo Data</button>
+                    <button class="btn btn-success" onclick="showAddClient()">Add New Client</button>
+                </div>
+            </div>
+
+            <h3>Standard Color Palettes</h3>
+            <div id="palettes" class="row"></div>
+
+            <h3 class="mt-5">Your Clients</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="table-dark">
+                        <tr><th>Name</th><th>Email</th><th>Access Code</th><th>Palette</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="clientsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT LOGIN SECTION -->
+    <div id="login" class="section">
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h3 class="text-center mb-4"><i class="fas fa-user"></i> Client Access</h3>
+                            <form onsubmit="clientLogin(event)">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="clientEmail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Access Code</label>
+                                    <input type="text" class="form-control" id="clientCode" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Access My Palette</button>
+                            </form>
+                            <div class="text-center mt-3">
+                                <small>Demo: sarah@example.com / DEMO123</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT DASHBOARD SECTION -->
+    <div id="clientDash" class="section">
+        <div class="container mt-4">
+            <div class="d-flex justify-content-between mb-4">
+                <h2>Welcome, <span id="clientName"></span>!</h2>
+                <button class="btn btn-secondary" onclick="showHome()">Logout</button>
+            </div>
+
+            <h3>Your Color Palette</h3>
+            <div id="clientPalette" class="row"></div>
+
+            <h3 class="mt-5">Shopping Suggestions</h3>
+            <div id="suggestions" class="row"></div>
+        </div>
+    </div>
+
+    <!-- ADD CLIENT MODAL -->
+    <div class="modal fade" id="addClientModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Client</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" id="newClientName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="newClientEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Palette</label>
+                        <select class="form-control" id="paletteSelect"></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addClient()">Add Client</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let clients = JSON.parse(localStorage.getItem('clients') || '[]');
+        
+        const palettes = [
+            {id: 1, name: "Spring Bloom", colors: ["#FFB6C1", "#FF69B4", "#98FB98", "#F0FFF0", "#FFE4E1", "#FFF8DC"]},
+            {id: 2, name: "Ocean Breeze", colors: ["#87CEEB", "#4682B4", "#5F9EA0", "#B0E0E6", "#E0FFFF", "#F0F8FF"]},
+            {id: 3, name: "Autumn Warmth", colors: ["#D2691E", "#CD853F", "#A0522D", "#F4A460", "#DEB887", "#FFEFD5"]},
+            {id: 4, name: "Winter Elegance", colors: ["#708090", "#2F4F4F", "#696969", "#C0C0C0", "#F5F5F5", "#FFFFFF"]},
+            {id: 5, name: "Berry Delight", colors: ["#8B0000", "#DC143C", "#FF1493", "#FF69B4", "#FFB6C1", "#FFF0F5"]},
+            {id: 6, name: "Royal Purple", colors: ["#4B0082", "#663399", "#9370DB", "#BA55D3", "#DDA0DD", "#F8F0FF"]}
+        ];
+
+        const suggestions = {
+            1: [{name: "Nordstrom", items: ["Floral dresses", "Spring scarves"], url: "https://nordstrom.com"}],
+            2: [{name: "J.Crew", items: ["Navy blazers", "Denim shirts"], url: "https://jcrew.com"}],
+            3: [{name: "Zara", items: ["Autumn coats", "Warm sweaters"], url: "https://zara.com"}],
+            4: [{name: "Theory", items: ["Professional wear", "Gray suits"], url: "https://theory.com"}],
+            5: [{name: "Kate Spade", items: ["Bold accessories", "Wine bags"], url: "https://katespade.com"}],
+            6: [{name: "Saks", items: ["Luxury items", "Purple jewelry"], url: "https://saks.com"}]
+        };
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function showHome() { showSection('home'); }
+        function showAdmin() { showSection('admin'); loadPalettes(); loadClients(); }
+        function showLogin() { showSection('login'); }
+
+        function loadPalettes() {
+            const container = document.getElementById('palettes');
+            container.innerHTML = palettes.map(p => 
+                `<div class="col-md-4"><div class="palette-card">
+                    <h5>${p.name}</h5>
+                    <div>${p.colors.map(c => `<div class="color-swatch" style="background:${c}"></div>`).join('')}</div>
+                </div></div>`
+            ).join('');
+
+            const select = document.getElementById('paletteSelect');
+            select.innerHTML = palettes.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        }
+
+        function loadClients() {
+            const table = document.getElementById('clientsTable');
+            if (clients.length === 0) {
+                table.innerHTML = '<tr><td colspan="5" class="text-center">No clients yet. Add demo data or create new clients.</td></tr>';
+                return;
+            }
+            table.innerHTML = clients.map(c => {
+                const palette = palettes.find(p => p.id === c.paletteId);
+                return `<tr>
+                    <td>${c.name}</td>
+                    <td>${c.email}</td>
+                    <td><code>${c.code}</code></td>
+                    <td>${palette ? palette.name : 'None'}</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteClient('${c.id}')">Delete</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function addDemoData() {
+            if (clients.length === 0) {
+                clients = [
+                    {id: '1', name: 'Sarah Johnson', email: 'sarah@example.com', code: 'DEMO123', paletteId: 1},
+                    {id: '2', name: 'Emily Chen', email: 'emily@example.com', code: 'DEMO456', paletteId: 2}
+                ];
+                localStorage.setItem('clients', JSON.stringify(clients));
+                loadClients();
+                alert('Demo data added! Try login with sarah@example.com / DEMO123');
+            }
+        }
+
+        function showAddClient() {
+            new bootstrap.Modal(document.getElementById('addClientModal')).show();
+        }
+
+        function addClient() {
+            const name = document.getElementById('newClientName').value;
+            const email = document.getElementById('newClientEmail').value;
+            const paletteId = parseInt(document.getElementById('paletteSelect').value);
+            
+            if (!name || !email) return alert('Please fill all fields');
+            
+            const newClient = {
+                id: Date.now().toString(),
+                name, email, paletteId,
+                code: Math.random().toString(36).substr(2, 8).toUpperCase()
+            };
+            
+            clients.push(newClient);
+            localStorage.setItem('clients', JSON.stringify(clients));
+            loadClients();
+            bootstrap.Modal.getInstance(document.getElementById('addClientModal')).hide();
+            alert(`Client added! Access code: ${newClient.code}`);
+        }
+
+        function deleteClient(id) {
+            if (confirm('Delete this client?')) {
+                clients = clients.filter(c => c.id !== id);
+                localStorage.setItem('clients', JSON.stringify(clients));
+                loadClients();
+            }
+        }
+
+        function clientLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('clientEmail').value;
+            const code = document.getElementById('clientCode').value;
+            const client = clients.find(c => c.email === email && c.code === code);
+            
+            if (client) {
+                document.getElementById('clientName').textContent = client.name;
+                showClientPalette(client);
+                showSection('clientDash');
+            } else {
+                alert('Invalid credentials');
+            }
+        }
+
+        function showClientPalette(client) {
+            const palette = palettes.find(p => p.id === client.paletteId);
+            if (!palette) return;
+            
+            const paletteDiv = document.getElementById('clientPalette');
+            paletteDiv.innerHTML = `
+                <div class="col-12">
+                    <div class="palette-card">
+                        <h4>${palette.name}</h4>
+                        <div class="row">
+                            ${palette.colors.map((color, i) => `
+                                <div class="col-md-2 text-center">
+                                    <div class="client-color-circle" style="background:${color}"></div>
+                                    <small>Color ${i+1}<br>${color}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const suggestionsDiv = document.getElementById('suggestions');
+            const shopSuggestions = suggestions[client.paletteId] || [];
+            suggestionsDiv.innerHTML = shopSuggestions.map(shop => `
+                <div class="col-md-4">
+                    <div class="shopping-card">
+                        <h5>${shop.name}</h5>
+                        ${shop.items.map(item => `<div>${item}</div>`).join('')}
+                        <a href="${shop.url}" target="_blank" class="btn btn-primary btn-sm mt-2">Visit Store</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        showHome();
+    </script>
+</body>
+</html>
